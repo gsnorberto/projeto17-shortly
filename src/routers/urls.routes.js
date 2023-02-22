@@ -1,6 +1,9 @@
 import express from 'express'
 let urlsRouter = express.Router()
 
-urlsRouter.get('/', )
+urlsRouter.get('/urls/:id', )
+urlsRouter.get('/urls/open/:shortUrl', )
+urlsRouter.post('/urls/shorten', )
+urlsRouter.delete('/urls/:id', )
 
 export default urlsRouter
