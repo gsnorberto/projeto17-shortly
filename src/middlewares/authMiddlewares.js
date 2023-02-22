@@ -1,4 +1,4 @@
-import { userDataFormat } from "../schemas/authSchemas.js"
+import { loginDataFormat, userDataFormat } from "../schemas/authSchemas.js"
 
 export const validateNewUserData = (req, res, next) => {
     // prevent string with blank spaces
@@ -11,6 +11,20 @@ export const validateNewUserData = (req, res, next) => {
 
     try {
         const { error } = userDataFormat.validate(req.body)
+
+        if (error == null) {
+            next();
+        } else {
+            res.status(422).send(error.details[0].message)
+        }
+    } catch (error) {
+        res.status(422).send(error.details[0].message)
+    }
+}
+
+export const validateAuthData = (req, res, next) => {
+    try {
+        const { error } = loginDataFormat.validate(req.body)
 
         if (error == null) {
             next();

@@ -1,8 +1,51 @@
 import { db } from "../config/database.js"
+import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
-export const signin = () => {
+export const signin = async (req, res) => {
+    let { email, password } = req.body
 
+    try {
+        //check if user exists
+        let user = await db.query('SELECT * FROM users WHERE email = $1', [email])
+        // user not found
+        if (user.rows.length === 0) return res.sendStatus(401)
+
+        // check password
+        const checkPassword = await bcrypt.compare(password, user.rows[0].password)
+        // invalid password
+        if (!checkPassword) return res.sendStatus(401)
+
+        // Create Token JWT
+        const secret = '12asdf543' // TEMPORARY
+        const token = jwt.sign({ id: user.rows[0].id }, secret)
+
+        // check if authentication already exists
+        let userAuth = await db.query('SELECT * FROM sessions WHERE user_id = $1', [user.rows[0].id])
+
+        let query;
+        if (userAuth.rows.length !== 0) { // 
+            query = `
+                UPDATE sessions
+                SET token = $1
+                WHERE user_id = $2
+            `
+        } else {
+            query = `
+                INSERT INTO 
+                    sessions (token, user_id)
+                VALUES
+                    ($1, $2)
+            `
+        }
+
+        await db.query(query, [token, user.rows[0].id])
+
+        // successful login
+        res.status(200).json({ token })
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
 }
 
 export const signup = async (req, res) => {
