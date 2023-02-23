@@ -74,3 +74,26 @@ export const openUrl = async (req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const deleteUrl = async (req, res) => {
+    let token = req.headers.authorization.split(' ')[1]
+    let id = req.params.id
+
+    try{
+        // Check if the token is valid
+        let userSession = await db.query('SELECT * FROM sessions WHERE token = $1', [token])
+        if(userSession.rows.length === 0) return res.sendStatus(401) // invalid token
+
+        // Check if the url exists
+        let urlData = await db.query('SELECT * FROM urls WHERE id = $1', [id])
+        if(urlData.rows.length === 0) return res.sendStatus(404)
+
+        // check url owner
+        if(urlData.rows[0].user_id !== userSession.rows[0].user_id)  return res.sendStatus(401)
+
+        await db.query('DELETE FROM urls WHERE id = $1', [id])
+        res.sendStatus(204)
+    } catch (error){
+        res.status(500).send(error.message)
+    }
+}
