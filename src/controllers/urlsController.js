@@ -49,3 +49,28 @@ export const getShortUrl = async (req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const openUrl = async (req, res) => {
+    let shortUrl = req.params.shortUrl;
+
+    try{
+        // check if shortUrl exists
+        let urlData = await db.query('SELECT * FROM urls WHERE short_url = $1', [shortUrl])
+        if(urlData.rows.length === 0) return res.sendStatus(404)
+
+        let query = `
+            UPDATE urls
+            SET visit_count = $1
+            WHERE short_url = $2
+        `
+
+        // increase visit count
+        let visitCount = urlData.rows[0].visit_count + 1
+        await db.query(query, [visitCount, shortUrl])
+
+        // redirect to destination url
+        res.redirect(urlData.rows[0].url)
+    } catch (error){
+        res.status(500).send(error.message)
+    }
+}
