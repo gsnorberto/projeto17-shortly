@@ -24,7 +24,7 @@ export const signin = async (req, res) => {
         let userAuth = await db.query('SELECT * FROM sessions WHERE user_id = $1', [user.rows[0].id])
 
         let query;
-        if (userAuth.rows.length !== 0) { // 
+        if (userAuth.rows.length !== 0) {
             query = `
                 UPDATE sessions
                 SET token = $1
