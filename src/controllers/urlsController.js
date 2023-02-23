@@ -32,3 +32,20 @@ export const addShortUrl = async (req, res) => {
         res.status(500).send(error.message)
     }
 }
+
+export const getShortUrl = async (req, res) => {
+    let urlId = req.params.id;
+
+    try{
+        let urlData = await db.query('SELECT * FROM urls WHERE id = $1', [urlId])
+        if(urlData.rows.length === 0) return res.sendStatus(404)
+
+        let id = urlData.rows[0].id
+        let shortUrl = urlData.rows[0].short_url
+        let url = urlData.rows[0].url
+
+        res.status(200).json({id, shortUrl, url})
+    } catch (error){
+        res.status(500).send(error.message)
+    }
+}
