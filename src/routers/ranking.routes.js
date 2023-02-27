@@ -1,6 +1,7 @@
 import express from 'express'
+import { getRanking } from '../controllers/rankingController.js'
 let rankingRouter = express.Router()
 
-rankingRouter.post('/ranking')
+rankingRouter.get('/ranking', getRanking)
 
 export default rankingRouter
