@@ -13,7 +13,8 @@ export const getRanking = async (req, res) => {
             left join urls
                 on users.id  = urls.user_id
             group by users.id, urls.user_id
-            order by "visitCount" desc;
+            order by "visitCount" desc
+            limit 10;
         `
 
         let ranking = await db.query(query)

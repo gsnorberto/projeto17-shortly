@@ -53,6 +53,8 @@ export const signup = async (req, res) => {
     let email = req.body.email.trim();
     let password = req.body.password;
 
+    if(!isNaN(parseFloat(name)) && isFinite(name)) return res.sendStatus(422)
+
     // encrypt password
     const salt = await bcrypt.genSalt(10)
     let passwordHash = await bcrypt.hash(password, salt)
